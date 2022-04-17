@@ -21,9 +21,15 @@
   },
   "homepage": "https://github.com/sambit-sankalp/project-profilia#readme",
   "dependencies": {
+    "@ant-design/icons": "^4.7.0",
+    "antd": "^4.19.5",
+    "css-loader": "^6.7.1",
     "html-webpack-plugin": "^5.5.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
+    "react-router-dom": "^6.3.0",
+    "style-loader": "^3.3.1",
+    "styled-components": "^5.3.5",
     "webpack-dev-server": "^4.8.1"
   },
   "devDependencies": {
