@@ -8,17 +8,15 @@ import SignUp from './screens/SignUp';
 
 const App = () => {
   return (
-    <div>
-      <Router>
-        <Marginals>
-          <Routes>
-            <Route path="/" element={<Homepage />} />
-            <Route path="/signin" element={<SignIn />} />
-            <Route path="/signup" element={<SignUp />} />
-          </Routes>
-        </Marginals>
-      </Router>
-    </div>
+    <Router>
+      <Marginals>
+        <Routes>
+          <Route path="/" element={<Homepage />} />
+          <Route exact path="/signin" element={<SignIn />} />
+          <Route path="/signup" element={<SignUp />} />
+        </Routes>
+      </Marginals>
+    </Router>
   );
 };
 
