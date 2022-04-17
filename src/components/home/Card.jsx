@@ -19,9 +19,9 @@ const CardComponent = () => {
       ]}
     >
       <Meta
-        avatar={<Avatar src="https://joeschmoe.io/api/v1/random" />}
-        title="Card title"
-        description="This is the description"
+        avatar={<Avatar src="https://randomuser.me/api/portraits/men/58.jpg" />}
+        title="Juan Velasco"
+        description="Hi there I am using this app"
       />
     </Card>
   );

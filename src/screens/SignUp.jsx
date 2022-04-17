@@ -1,5 +1,8 @@
 import React from 'react';
 import { Form, Input, Button, Checkbox, Card } from 'antd';
+import { ref, set } from 'firebase/database';
+
+import { db } from '../config/firebase';
 
 const SignIn = () => {
   const onFinish = (values) => {
@@ -20,6 +23,12 @@ const SignIn = () => {
   const button = {
     marginTop: '10px',
   };
+
+  set(ref(db, 'users/' + 2), {
+    name: 'Sambit Adam',
+    status: 'Hi there I am using this app',
+    imageUrl: 'https://randomuser.me/api/portraits/men/5.jpg',
+  });
 
   return (
     <Card style={{ marginTop: '80px' }}>

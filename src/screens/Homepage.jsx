@@ -3,7 +3,9 @@ import Card from '../components/home/Card';
 
 import styled from 'styled-components';
 import { Pagination } from 'antd';
-import Marginals from '../components/marginals/Marginals';
+
+import { ref, onValue } from 'firebase/database';
+import { db } from '../config/firebase';
 
 const Container = styled.div`
   width: 100%;
@@ -23,6 +25,12 @@ const CardContainer = styled.div`
 `;
 
 const Homepage = () => {
+  const starCountRef = ref(db, 'users/');
+  onValue(starCountRef, (snapshot) => {
+    const data = snapshot.val();
+    console.log(data);
+  });
+
   return (
     <Container>
       <CardContainer>
