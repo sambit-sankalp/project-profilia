@@ -1,77 +1,168 @@
 import React from 'react';
-import { Form, Input, Button, Checkbox, Card } from 'antd';
-import { ref, set } from 'firebase/database';
+import { Form, Input, Select, Button } from 'antd';
+const { Option } = Select;
 
-import { db } from '../config/firebase';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  googleAuthAction,
+  signInAnonymouslyAction,
+  userUpdateAction,
+} from '../store/actions/userActions';
 
-const SignIn = () => {
+const formItemLayout = {
+  labelCol: {
+    xs: {
+      span: 24,
+    },
+    sm: {
+      span: 8,
+    },
+  },
+  wrapperCol: {
+    xs: {
+      span: 24,
+    },
+    sm: {
+      span: 16,
+    },
+  },
+};
+const tailFormItemLayout = {
+  wrapperCol: {
+    xs: {
+      span: 24,
+      offset: 0,
+    },
+    sm: {
+      span: 16,
+      offset: 8,
+    },
+  },
+};
+
+const card = {
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'center',
+  flexDirection: 'column',
+};
+const button = {
+  marginTop: '10px',
+};
+const input = {
+  marginLeft: '10px',
+};
+
+const RegistrationForm = () => {
+  const [form] = Form.useForm();
+  const dispatch = useDispatch();
+
   const onFinish = (values) => {
-    console.log('Success:', values);
+    // console.log('Received values of form: ', values);
   };
 
-  const onFinishFailed = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+  const data = useSelector((state) => state.googleAuth);
+  const { loading, error, user } = data;
+
+  const userDetails = useSelector((state) => state.anonymousAuth);
+  const { loading: aloading, error: aError, user: randomUser } = userDetails;
+
+  console.log('anonymous', randomUser);
+  console.log('google', user);
+
+  const googlesignin = () => {
+    dispatch(googleAuthAction());
   };
 
-  const card = {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
+  const anonymouslogin = () => {
+    // dispatch(signInAnonymouslyAction());
+    dispatch(userUpdateAction('s7b7nCM0ycT9C2y0Y1BVnyCQXiP2'));
   };
-
-  const button = {
-    marginTop: '10px',
-  };
-
-  set(ref(db, 'users/' + 2), {
-    name: 'Sambit Adam',
-    status: 'Hi there I am using this app',
-    imageUrl: 'https://randomuser.me/api/portraits/men/5.jpg',
-  });
 
   return (
-    <Card style={{ marginTop: '80px' }}>
+    <div style={card}>
       <Form
         style={card}
-        name="basic"
-        labelCol={{
-          span: 8,
-        }}
-        wrapperCol={{
-          span: 16,
-        }}
-        initialValues={{
-          remember: true,
-        }}
+        {...formItemLayout}
+        form={form}
+        name="register"
         onFinish={onFinish}
-        onFinishFailed={onFinishFailed}
-        autoComplete="off"
+        initialValues={{
+          residence: ['zhejiang', 'hangzhou', 'xihu'],
+          prefix: '86',
+        }}
+        scrollToFirstError
       >
         <Form.Item
-          label="Username"
-          name="username"
+          name="email"
+          label="E-mail"
           rules={[
             {
+              type: 'email',
+              message: 'The input is not valid E-mail!',
+            },
+            {
               required: true,
-              message: 'Please input your username!',
+              message: 'Please input your E-mail!',
             },
           ]}
         >
-          <Input />
+          <Input style={input} />
         </Form.Item>
 
         <Form.Item
-          label="Password"
           name="password"
+          label="Password"
           rules={[
             {
               required: true,
               message: 'Please input your password!',
             },
           ]}
+          hasFeedback
         >
-          <Input.Password />
+          <Input.Password style={input} />
+        </Form.Item>
+
+        <Form.Item
+          name="confirm"
+          label="Confirm Password"
+          dependencies={['password']}
+          hasFeedback
+          rules={[
+            {
+              required: true,
+              message: 'Please confirm your password!',
+            },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue('password') === value) {
+                  return Promise.resolve();
+                }
+
+                return Promise.reject(
+                  new Error('The two passwords that you entered do not match!')
+                );
+              },
+            }),
+          ]}
+        >
+          <Input.Password style={input} />
+        </Form.Item>
+
+        <Form.Item
+          name="username"
+          label="Username"
+          tooltip="What do you want others to call you?"
+          rules={[
+            {
+              required: true,
+              message: 'Please input your nickname!',
+              whitespace: true,
+            },
+          ]}
+        >
+          <Input style={input} />
         </Form.Item>
 
         <Form.Item
@@ -84,25 +175,67 @@ const SignIn = () => {
             },
           ]}
         >
-          <Input />
+          <Input style={input} />
         </Form.Item>
 
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
+        <Form.Item
+          name="status"
+          label="Status"
+          rules={[
+            {
+              required: true,
+              message: 'Please input Intro',
+            },
+          ]}
+        >
+          <Input.TextArea showCount maxLength={10} />
+        </Form.Item>
 
-        <div style={{ textAlign: 'center', marginTop: '10px' }}>
-          ----- or -----
-        </div>
-        <Button style={button} type="primary" htmlType="submit">
-          Sign in with Google
-        </Button>
-        <Button style={button} type="primary" htmlType="submit">
-          Sign in Anonymously
-        </Button>
+        <Form.Item
+          name="gender"
+          label="Gender"
+          rules={[
+            {
+              required: true,
+              message: 'Please select gender!',
+            },
+          ]}
+        >
+          <Select style={input} placeholder="select your gender">
+            <Option value="male">Male</Option>
+            <Option value="female">Female</Option>
+            <Option value="other">Other</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item {...tailFormItemLayout}>
+          <Button type="primary" htmlType="submit">
+            Register
+          </Button>
+        </Form.Item>
       </Form>
-    </Card>
+
+      <div style={{ textAlign: 'center', marginTop: '10px' }}>
+        ----- or -----
+      </div>
+      <Button
+        onClick={googlesignin}
+        style={button}
+        type="primary"
+        htmlType="submit"
+      >
+        Sign in with Google
+      </Button>
+      <Button
+        onClick={anonymouslogin}
+        style={button}
+        type="primary"
+        htmlType="submit"
+      >
+        Sign in Anonymously
+      </Button>
+    </div>
   );
 };
 
-export default SignIn;
+export default RegistrationForm;

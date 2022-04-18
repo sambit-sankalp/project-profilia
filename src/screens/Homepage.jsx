@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Card from '../components/home/Card';
 
 import styled from 'styled-components';
 import { Pagination } from 'antd';
 
-import { ref, onValue } from 'firebase/database';
-import { db } from '../config/firebase';
+import { useDispatch, useSelector } from 'react-redux';
+import { allUserAction } from '../store/actions/userActions';
 
 const Container = styled.div`
   width: 100%;
@@ -25,11 +25,16 @@ const CardContainer = styled.div`
 `;
 
 const Homepage = () => {
-  const starCountRef = ref(db, 'users/');
-  onValue(starCountRef, (snapshot) => {
-    const data = snapshot.val();
-    console.log(data);
-  });
+  const dispatch = useDispatch();
+
+  const data = useSelector((state) => state.allUserReducer);
+  const { loading, error, allusers } = data;
+
+  console.log(allusers);
+
+  useEffect(() => {
+    dispatch(allUserAction());
+  }, [dispatch, allUserAction]);
 
   return (
     <Container>
