@@ -5,6 +5,7 @@ import {
   userUpdateReducer,
   userDetailsReducer,
   adminUpdateReducer,
+  currentUserReducer,
 } from './userReducer';
 import { combineReducers } from 'redux';
 
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   updateUser: userUpdateReducer,
   userDetails: userDetailsReducer,
   updateAdmin: adminUpdateReducer,
+  currentUser: currentUserReducer,
 });
 
 export default rootReducer;

@@ -14,12 +14,15 @@ import {
   USER_DETAILS_REQUEST,
   USER_DETAILS_SUCCESS,
   USER_DETAILS_FAIL,
+  CURRENT_USER_REQUEST,
+  CURRENT_USER_SUCCESS,
 } from '../constants/userContants';
 
 import {
   signInWithPopup,
   GoogleAuthProvider,
   signInAnonymously,
+  onAuthStateChanged,
 } from 'firebase/auth';
 
 import { auth, db, provider } from '../../config/firebase';
@@ -41,17 +44,36 @@ export const googleAuthAction = () => async (dispatch) => {
     .then((result) => {
       const credential = GoogleAuthProvider.credentialFromResult(result);
       const user = result.user;
-      console.log(user);
-      // localStorage.setItem('userInfo', JSON.stringify(user.uid));
+      localStorage.setItem('id', user.uid);
+      localStorage.setItem('name', user.displayName);
+      localStorage.setItem('isAnonymous', false);
       const dbRef = ref(getDatabase());
       get(child(dbRef, `users/${user.uid}`))
         .then((snapshot) => {
           if (snapshot.exists()) {
+            // console.log(snapshot.val());
+            if (snapshot.val().cardsLiked) {
+              localStorage.setItem(
+                'likes',
+                JSON.stringify(snapshot.val().cardsLiked)
+              );
+            }
+            if (snapshot.val().cardsDisliked) {
+              localStorage.setItem(
+                'dislikes',
+                JSON.stringify(snapshot.val().cardsDisliked)
+              );
+            }
+            if (snapshot.val().favCards) {
+              localStorage.setItem(
+                'fav',
+                JSON.stringify(snapshot.val().favCards)
+              );
+            }
             dispatch({
               type: GOOGLE_LOGIN_SUCCESS,
               payload: snapshot.val(),
             });
-            console.log({ ...snapshot.val(), status: 'Present' });
           } else {
             dispatch({
               type: GOOGLE_LOGIN_SUCCESS,
@@ -61,6 +83,9 @@ export const googleAuthAction = () => async (dispatch) => {
               uid: user.uid,
               name: user.displayName,
               email: user.email,
+              status: 'Hi there I am using this app',
+              likes: 0,
+              dislikes: 0,
             });
           }
         })
@@ -88,9 +113,20 @@ export const signInAnonymouslyAction = () => async (dispatch) => {
       const {
         data: { results },
       } = await axios.get('https://randomuser.me/api/');
+      localStorage.setItem('id', results[0].login.uuid);
+      localStorage.setItem('name', results[0].name.first);
+      localStorage.setItem('isAnonymous', true);
       dispatch({
         type: ANONYMOUS_LOGIN_SUCCESS,
-        payload: results,
+        payload: results[0].name,
+      });
+      set(ref(db, 'users/' + results[0].login.uuid), {
+        uid: results[0].login.uuid,
+        name: results[0].name.first,
+        email: results[0].picture.large,
+        status: 'Hi there I am using this app',
+        likes: 0,
+        dislikes: 0,
       });
     })
     .catch((error) => {
@@ -136,13 +172,10 @@ export const userDetailsAction = (uid) => async (dispatch, getState) => {
   get(child(dbRef, `users/${uid}`))
     .then((snapshot) => {
       if (snapshot.exists()) {
-        console.log(snapshot.val());
         dispatch({
           type: USER_DETAILS_SUCCESS,
-          payload: data,
+          payload: snapshot.val(),
         });
-      } else {
-        console.log('No data available');
       }
     })
     .catch((error) => {
@@ -156,64 +189,86 @@ export const userDetailsAction = (uid) => async (dispatch, getState) => {
     });
 };
 
-export const userUpdateAction =
-  (uid, likes, dislikes) => async (dispatch, getState) => {
-    dispatch({ type: USER_UPDATE_REQUEST });
+export const userUpdateAction = (uid, likes, dislikes) => async (dispatch) => {
+  dispatch({ type: USER_UPDATE_REQUEST });
 
-    // const {
-    //   googleAuth: { user },
-    // } = getState();
+  const adminID = localStorage.getItem('id');
+  const cardsLiked = JSON.parse(localStorage.getItem('likes'));
+  const cardsDisliked = JSON.parse(localStorage.getItem('dislikes'));
+  const favCards = JSON.parse(localStorage.getItem('fav'));
 
-    // console.log(user.uid);
+  // console.log(adminID, cardsLiked, cardsDisliked);
 
-    // const adminRef = ref(db, `users/${user.uid}`);
+  if (cardsDisliked || cardsLiked || favCards) {
+    const adminRef = ref(db, `users/${adminID}`);
 
-    // console.log(userInfo);
-
-    const userRef = ref(db, `users/${uid}`);
-    update(userRef, { likes: likes, dislikes: dislikes })
+    update(adminRef, {
+      cardsLiked: cardsLiked,
+      cardsDisliked: cardsDisliked,
+      favCards: favCards,
+    })
       .then(() => {
-        dispatch({
-          type: USER_UPDATE_SUCCESS,
-        });
+        console.log('done');
       })
       .catch((error) => {
-        dispatch({
-          type: USER_UPDATE_FAIL,
-          payload:
-            error.response && error.response.data.message
-              ? error.response.data.message
-              : error.message,
-        });
+        console.error(error);
       });
-  };
+  }
 
-export const adminUpdateAction =
-  (status, cardsLiked, cardsDisliked, cardsFavourite) =>
-  async (dispatch, getState) => {
-    dispatch({ type: USER_UPDATE_REQUEST });
-
-    const {
-      googleAuth: { user },
-    } = getState();
-
-    // console.log(user.uid);
-
-    const adminRef = ref(db, `users/${user.uid}`);
-
-    update(adminRef, { status, cardsLiked, cardsDisliked, cardsFavourite })
-      .then(() => {
-        dispatch({
-          type: USER_UPDATE_SUCCESS,
-        });
-      })
-      .catch((error) => {
-        dispatch({
-          type: USER_UPDATE_FAIL,
-          payload:
-            error.response && error.response.data.message
-              ? error.response.data.message
-              : error.message,
-        });
+  const userRef = ref(db, `users/${uid}`);
+  update(userRef, {
+    likes: likes,
+    dislikes: dislikes,
+  })
+    .then(() => {
+      dispatch({
+        type: USER_UPDATE_SUCCESS,
       });
-  };
+    })
+    .catch((error) => {
+      dispatch({
+        type: USER_UPDATE_FAIL,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    });
+};
+
+export const adminUpdateAction = (status, id) => async (dispatch, getState) => {
+  dispatch({ type: USER_UPDATE_REQUEST });
+
+  const {
+    googleAuth: { user },
+  } = getState();
+
+  const adminRef = ref(db, `users/${id}`);
+
+  update(adminRef, { status: status })
+    .then(() => {
+      dispatch({
+        type: USER_UPDATE_SUCCESS,
+      });
+    })
+    .catch((error) => {
+      dispatch({
+        type: USER_UPDATE_FAIL,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    });
+};
+
+export const currentUserAction = () => async (dispatch) => {
+  dispatch({ type: CURRENT_USER_REQUEST });
+
+  onAuthStateChanged(auth, (user) => {
+    dispatch({
+      type: CURRENT_USER_SUCCESS,
+      payload: user,
+    });
+  });
+};

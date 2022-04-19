@@ -10,14 +10,7 @@ import rootReducer from './store/reducers/rootreducer';
 
 import thunk from 'redux-thunk';
 
-// const userInfoFromStorge = localStorage.getItem('userInfo')
-//   ? JSON.parse(localStorage.getItem('userInfo'))
-//   : null;
-
-// const initialState = {
-//   userLogin: { userInfo: userInfoFromStorge },
-// };
-
+import UserContextProvider from './context/UserContext';
 const store = createStore(rootReducer, applyMiddleware(thunk));
 
 const container = document.getElementById('root');
@@ -25,6 +18,8 @@ const root = ReactDOMClient.createRoot(container);
 
 root.render(
   <Provider store={store}>
-    <App />
+    <UserContextProvider>
+      <App />
+    </UserContextProvider>
   </Provider>
 );
