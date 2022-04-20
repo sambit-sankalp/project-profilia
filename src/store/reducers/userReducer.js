@@ -176,25 +176,3 @@ export const currentUserReducer = (state = { user: {} }, action) => {
       return state;
   }
 };
-
-export const anonymousUserReducer = (state = { user: {} }, action) => {
-  switch (action.type) {
-    case ANONYMOUS_USER_REQUEST:
-      return {
-        loading: true,
-        user: {},
-      };
-    case ANONYMOUS_LOGIN_SUCCESS:
-      return {
-        loading: false,
-        user: action.payload,
-      };
-    case ANONYMOUS_LOGIN_FAIL:
-      return {
-        loading: false,
-        error: action.payload,
-      };
-    default:
-      return state;
-  }
-};

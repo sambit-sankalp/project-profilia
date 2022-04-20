@@ -31,7 +31,7 @@ const NavContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #c6daff;
+  background-color: #2b394a;
   z-index: 999;
 `;
 
@@ -39,6 +39,7 @@ const Nav = styled.div`
   width: 100%;
   max-width: 85%;
   display: flex;
+  height: 100px;
   padding: 1rem 0rem;
   justify-content: space-between;
   align-items: center;
@@ -47,6 +48,7 @@ const Nav = styled.div`
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+    height: 170px;
   }
   .buttons {
     margin: 10px;
@@ -57,7 +59,9 @@ const Nav = styled.div`
 `;
 
 const Logo = styled.h1`
-  color: #000000;
+  color: #ffffff;
+  font-weight: 'bold';
+  margin-bottom: 0px;
   @media (max-width: 426px) {
     margin-top: 20px;
   }
@@ -70,7 +74,7 @@ const Header = styled.div`
 `;
 
 const Navbar = () => {
-  const { isAnonymous, setisAnonymous, setcurrentUser } =
+  const { isAnonymous, setcurrentUser } =
     useContext(UserContext);
   const [cur, setCur] = useState({});
   const dispatch = useDispatch();
@@ -112,7 +116,7 @@ const Navbar = () => {
     <NavContainer>
       <Nav>
         <Link to="/">
-          <Logo>Profilia</Logo>
+          <Logo>PROFILIA</Logo>
         </Link>
         {cur && cur.uid ? (
           <Header>
@@ -120,8 +124,9 @@ const Navbar = () => {
               style={{
                 marginRight: '10px',
                 fontSize: '20px',
-                fontWeight: 500,
+                fontWeight: 700,
                 marginBottom: 0,
+                color: '#fff',
               }}
             >
               Hi, {localStorage.getItem('name')}
@@ -129,6 +134,12 @@ const Navbar = () => {
             <Profile isAnonymous={isAnonymous} />
             <Tooltip title="Sign Out">
               <Button
+              style={{
+                marginRight: '10px',
+                backgroundColor: '#b67473',
+                color: '#fff',
+                border: 'none',
+              }}
                 onClick={signOutHandler}
                 type="primary"
                 shape="circle"
@@ -141,8 +152,12 @@ const Navbar = () => {
           <div>
             <Tooltip title="Google Sign In">
               <Button
-                style={{ marginRight: '10px' }}
-                type="primary"
+                style={{
+                  marginRight: '10px',
+                  backgroundColor: '#b67473',
+                  color: '#fff',
+                  border: 'none',
+                }}
                 shape="circle"
                 onClick={() => dispatch(googleAuthAction())}
                 icon={<GoogleOutlined />}
@@ -151,9 +166,13 @@ const Navbar = () => {
             </Tooltip>
             <Tooltip title="Anonymous Sign In">
               <Button
-                style={{ marginRight: '10px' }}
+                style={{
+                  marginRight: '10px',
+                  backgroundColor: '#b67473',
+                  color: '#fff',
+                  border: 'none',
+                }}
                 onClick={() => dispatch(signInAnonymouslyAction())}
-                type="primary"
                 shape="circle"
                 icon={<UserOutlined />}
                 size="large"
@@ -162,8 +181,12 @@ const Navbar = () => {
             {localStorage.getItem('anonymousId') && (
               <Tooltip title="Existing Anonymous Sign In">
                 <Button
+                  style={{
+                    backgroundColor: '#b67473',
+                    color: '#fff',
+                    border: 'none',
+                  }}
                   onClick={() => dispatch(userDetailsAction())}
-                  type="primary"
                   shape="circle"
                   icon={<LoginOutlined />}
                   size="large"

@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 
 import styled from 'styled-components';
 import Card from './Card';
@@ -14,8 +14,10 @@ const CardContainer = styled.div`
 `;
 
 const Title = styled.h1`
+  text-transform: capitalize;
   text-align: center;
   margin-bottom: 0px;
+  font-weight: 500;
 `;
 
 const Para = styled.p`

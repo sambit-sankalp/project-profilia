@@ -2,10 +2,7 @@ import React from 'react';
 import { Modal, Button, Input, Tooltip } from 'antd';
 
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  adminUpdateAction,
-  currentUserAction,
-} from '../../store/actions/userActions';
+import { adminUpdateAction } from '../../store/actions/userActions';
 
 import { EditOutlined } from '@ant-design/icons';
 
@@ -16,14 +13,10 @@ const Profile = () => {
 
   const showModal = () => {
     setVisible(true);
-    dispatch(currentUserAction());
   };
-  
+
   const data = useSelector((state) => state.updateAdmin);
   const { loading, error, success } = data;
-
-  const currentUser = useSelector((state) => state.currentUser);
-  const { user } = currentUser;
 
   const handleOk = () => {
     dispatch(adminUpdateAction(modalText, localStorage.getItem('id')));
@@ -39,7 +32,12 @@ const Profile = () => {
     <>
       <Tooltip title="Update Status">
         <Button
-          style={{ marginRight: '10px' }}
+          style={{
+            marginRight: '10px',
+            backgroundColor: '#b67473',
+            color: '#fff',
+            border: 'none',
+          }}
           onClick={showModal}
           type="primary"
           shape="circle"

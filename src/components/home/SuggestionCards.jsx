@@ -15,6 +15,8 @@ const CardContainer = styled.div`
 
 const Title = styled.h1`
   text-align: center;
+  text-transform: capitalize;
+  font-weight: 500;
 `;
 
 const Para = styled.p`

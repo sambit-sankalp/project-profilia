@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import styled from 'styled-components';
-import { Pagination, Spin } from 'antd';
+import { Spin } from 'antd';
 
 import { useDispatch, useSelector } from 'react-redux';
 import {
@@ -11,6 +11,7 @@ import {
 } from '../store/actions/userActions';
 import FavouriteCards from '../components/home/FavouriteCards';
 import SuggestionsCards from '../components/home/SuggestionCards';
+import LandingPage from './LandingPage';
 
 const Container = styled.div`
   width: 100%;
@@ -25,11 +26,10 @@ const IntroBanner = styled.div`
   width: 100%;
   font-size: 40px;
   padding: 0px 200px;
-  min-height: 63vh;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center;
   @media (max-width: 426px) {
     font-size: 20px;
     padding: 0px 50px;
@@ -39,6 +39,9 @@ const IntroBanner = styled.div`
 const Title = styled.h1`
   font-size: 30px;
   margin-bottom: 0px;
+  margin-top: 30px;
+  text-transform: capitalize;
+  font-weight: 500;
 `;
 
 const Status = styled.p`
@@ -66,7 +69,6 @@ const Homepage = () => {
 
   const currentUser = useSelector((state) => state.currentUser);
   const { user } = currentUser;
-
 
   let array = Object.keys(allusers);
 
@@ -107,7 +109,7 @@ const Homepage = () => {
             </>
           ) : (
             <IntroBanner>
-              Heey pal, Welcome to Profilia. Please sign in to continue...
+              <LandingPage />
             </IntroBanner>
           )}
         </Container>
