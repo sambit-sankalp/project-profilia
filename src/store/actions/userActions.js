@@ -36,6 +36,7 @@ import {
   update,
 } from 'firebase/database';
 import axios from 'axios';
+import { async } from '@firebase/util';
 
 export const googleAuthAction = () => async (dispatch) => {
   dispatch({ type: GOOGLE_LOGIN_REQUEST });
@@ -52,6 +53,7 @@ export const googleAuthAction = () => async (dispatch) => {
         .then((snapshot) => {
           if (snapshot.exists()) {
             // console.log(snapshot.val());
+            localStorage.setItem('status', snapshot.val().status);
             if (snapshot.val().cardsLiked) {
               localStorage.setItem(
                 'likes',
@@ -70,11 +72,13 @@ export const googleAuthAction = () => async (dispatch) => {
                 JSON.stringify(snapshot.val().favCards)
               );
             }
+            window.location.reload(false);
             dispatch({
               type: GOOGLE_LOGIN_SUCCESS,
               payload: snapshot.val(),
             });
           } else {
+            localStorage.setItem('status', 'Hi there I am using this app');
             dispatch({
               type: GOOGLE_LOGIN_SUCCESS,
               payload: user,
@@ -114,15 +118,20 @@ export const signInAnonymouslyAction = () => async (dispatch) => {
         data: { results },
       } = await axios.get('https://randomuser.me/api/');
       localStorage.setItem('id', results[0].login.uuid);
-      localStorage.setItem('name', results[0].name.first);
+      localStorage.setItem('anonymousId', results[0].login.uuid);
+      localStorage.setItem(
+        'name',
+        `${results[0].name.first} ${results[0].name.last}`
+      );
       localStorage.setItem('isAnonymous', true);
+      localStorage.setItem('status', 'Hi there I am using this app');
       dispatch({
         type: ANONYMOUS_LOGIN_SUCCESS,
         payload: results[0].name,
       });
       set(ref(db, 'users/' + results[0].login.uuid), {
         uid: results[0].login.uuid,
-        name: results[0].name.first,
+        name: `${results[0].name.first} ${results[0].name.last}`,
         email: results[0].picture.large,
         status: 'Hi there I am using this app',
         likes: 0,
@@ -165,27 +174,60 @@ export const allUserAction = () => async (dispatch) => {
   }
 };
 
-export const userDetailsAction = (uid) => async (dispatch, getState) => {
+export const userDetailsAction = () => async (dispatch) => {
   dispatch({ type: USER_DETAILS_REQUEST });
 
-  const dbRef = ref(getDatabase());
-  get(child(dbRef, `users/${uid}`))
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        dispatch({
-          type: USER_DETAILS_SUCCESS,
-          payload: snapshot.val(),
+  const id = localStorage.getItem('anonymousId');
+
+  signInAnonymously(auth)
+    .then(() => {
+      const dbRef = ref(getDatabase());
+      get(child(dbRef, `users/${id}`))
+        .then((snapshot) => {
+          if (snapshot.exists()) {
+            localStorage.setItem('id', snapshot.val().uid);
+            localStorage.setItem('name', snapshot.val().name);
+            localStorage.setItem('isAnonymous', true);
+            localStorage.setItem('status', snapshot.val().status);
+            if (snapshot.val().cardsLiked) {
+              localStorage.setItem(
+                'likes',
+                JSON.stringify(snapshot.val().cardsLiked)
+              );
+            }
+            if (snapshot.val().cardsDisliked) {
+              localStorage.setItem(
+                'dislikes',
+                JSON.stringify(snapshot.val().cardsDisliked)
+              );
+            }
+            if (snapshot.val().favCards) {
+              localStorage.setItem(
+                'fav',
+                JSON.stringify(snapshot.val().favCards)
+              );
+            }
+            window.location.reload(false);
+            dispatch({
+              type: USER_DETAILS_SUCCESS,
+              payload: snapshot.val(),
+            });
+          }
+        })
+        .catch((error) => {
+          dispatch({
+            type: USER_DETAILS_FAIL,
+            payload:
+              error.response && error.response.data.message
+                ? error.response.data.message
+                : error.message,
+          });
         });
-      }
     })
     .catch((error) => {
-      dispatch({
-        type: USER_DETAILS_FAIL,
-        payload:
-          error.response && error.response.data.message
-            ? error.response.data.message
-            : error.message,
-      });
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(error);
     });
 };
 
@@ -238,10 +280,6 @@ export const userUpdateAction = (uid, likes, dislikes) => async (dispatch) => {
 
 export const adminUpdateAction = (status, id) => async (dispatch, getState) => {
   dispatch({ type: USER_UPDATE_REQUEST });
-
-  const {
-    googleAuth: { user },
-  } = getState();
 
   const adminRef = ref(db, `users/${id}`);
 

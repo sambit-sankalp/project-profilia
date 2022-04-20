@@ -3,7 +3,7 @@ import {
   googleSigninReducer,
   allUsersReducer,
   userUpdateReducer,
-  userDetailsReducer,
+  anonymousDetailsReducer,
   adminUpdateReducer,
   currentUserReducer,
 } from './userReducer';
@@ -14,7 +14,7 @@ const rootReducer = combineReducers({
   anonymousAuth: anonymousAuthReducer,
   allUserReducer: allUsersReducer,
   updateUser: userUpdateReducer,
-  userDetails: userDetailsReducer,
+  userDetails: anonymousDetailsReducer,
   updateAdmin: adminUpdateReducer,
   currentUser: currentUserReducer,
 });

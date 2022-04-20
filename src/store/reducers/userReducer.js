@@ -20,6 +20,9 @@ import {
   USER_DETAILS_REQUEST,
   USER_DETAILS_SUCCESS,
   USER_DETAILS_FAIL,
+  ANONYMOUS_USER_REQUEST,
+  ANONYMOUS_USER_SUCCESS,
+  ANONYMOUS_USER_FAIL,
 } from '../constants/userContants';
 
 export const googleSigninReducer = (state = { user: [] }, action) => {
@@ -109,7 +112,7 @@ export const userUpdateReducer = (state = {}, action) => {
   }
 };
 
-export const userDetailsReducer = (state = {}, action) => {
+export const anonymousDetailsReducer = (state = { user: {} }, action) => {
   switch (action.type) {
     case USER_DETAILS_REQUEST:
       return {
@@ -165,6 +168,28 @@ export const currentUserReducer = (state = { user: {} }, action) => {
         user: action.payload,
       };
     case CURRENT_USER_FAIL:
+      return {
+        loading: false,
+        error: action.payload,
+      };
+    default:
+      return state;
+  }
+};
+
+export const anonymousUserReducer = (state = { user: {} }, action) => {
+  switch (action.type) {
+    case ANONYMOUS_USER_REQUEST:
+      return {
+        loading: true,
+        user: {},
+      };
+    case ANONYMOUS_LOGIN_SUCCESS:
+      return {
+        loading: false,
+        user: action.payload,
+      };
+    case ANONYMOUS_LOGIN_FAIL:
       return {
         loading: false,
         error: action.payload,

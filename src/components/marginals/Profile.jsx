@@ -9,21 +9,16 @@ import {
 
 import { EditOutlined } from '@ant-design/icons';
 
-const Profile = ({ isAnonymous }) => {
+const Profile = () => {
   const [visible, setVisible] = React.useState(false);
-  const [confirmLoading, setConfirmLoading] = React.useState(false);
   const [modalText, setModalText] = React.useState('');
   const dispatch = useDispatch();
 
   const showModal = () => {
-    if (isAnonymous) {
-      alert('Sign out and Sign in with google to be a user ');
-    } else {
-      setVisible(true);
-      dispatch(currentUserAction());
-    }
+    setVisible(true);
+    dispatch(currentUserAction());
   };
-  console.log(isAnonymous);
+  
   const data = useSelector((state) => state.updateAdmin);
   const { loading, error, success } = data;
 
@@ -31,18 +26,14 @@ const Profile = ({ isAnonymous }) => {
   const { user } = currentUser;
 
   const handleOk = () => {
-    setConfirmLoading(true);
-    dispatch(adminUpdateAction(modalText, user.uid));
+    dispatch(adminUpdateAction(modalText, localStorage.getItem('id')));
+    localStorage.setItem('status', modalText);
     setVisible(false);
   };
-
-  // console.log(success);
 
   const handleCancel = () => {
-    console.log('Clicked cancel button');
     setVisible(false);
   };
-  console.log(modalText);
 
   return (
     <>
@@ -60,13 +51,12 @@ const Profile = ({ isAnonymous }) => {
         title="Update Your Status"
         visible={visible}
         onOk={handleOk}
-        confirmLoading={confirmLoading}
         onCancel={handleCancel}
       >
         <p>
           <Input
             onChange={(e) => setModalText(e.target.value)}
-            placeholder="Hi there I am using this app"
+            placeholder={localStorage.getItem('status')}
           />
         </p>
       </Modal>

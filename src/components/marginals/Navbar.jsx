@@ -9,25 +9,18 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   googleAuthAction,
   signInAnonymouslyAction,
+  userDetailsAction,
 } from '../../store/actions/userActions';
 import Profile from './Profile';
 
 import { signOut } from 'firebase/auth';
-import {
-  getDatabase,
-  ref,
-  set,
-  child,
-  get,
-  onValue,
-  update,
-} from 'firebase/database';
-import { auth, db } from '../../config/firebase';
+import { auth } from '../../config/firebase';
 
 import {
   GoogleOutlined,
   UserOutlined,
   LogoutOutlined,
+  LoginOutlined,
 } from '@ant-design/icons';
 import { UserContext } from '../../context/UserContext';
 
@@ -88,6 +81,8 @@ const Navbar = () => {
   const anonymousUser = useSelector((state) => state.anonymousAuth);
   const { user: anonymous } = anonymousUser;
 
+  console.log(isAnonymous);
+
   useEffect(() => {
     if (user) {
       setCur(user);
@@ -102,8 +97,8 @@ const Navbar = () => {
   const signOutHandler = () => {
     signOut(auth)
       .then(() => {
-        console.log('signOut');
         window.location.reload(false);
+        console.log('signOut');
         localStorage.removeItem('likes');
         localStorage.removeItem('dislikes');
         localStorage.removeItem('fav');
@@ -149,24 +144,32 @@ const Navbar = () => {
                 style={{ marginRight: '10px' }}
                 type="primary"
                 shape="circle"
-                onClick={() =>
-                  dispatch(googleAuthAction(), setisAnonymous(false))
-                }
+                onClick={() => dispatch(googleAuthAction())}
                 icon={<GoogleOutlined />}
                 size="large"
               />
             </Tooltip>
             <Tooltip title="Anonymous Sign In">
               <Button
-                onClick={() =>
-                  dispatch(signInAnonymouslyAction(), setisAnonymous(true))
-                }
+                style={{ marginRight: '10px' }}
+                onClick={() => dispatch(signInAnonymouslyAction())}
                 type="primary"
                 shape="circle"
                 icon={<UserOutlined />}
                 size="large"
               />
             </Tooltip>
+            {localStorage.getItem('anonymousId') && (
+              <Tooltip title="Existing Anonymous Sign In">
+                <Button
+                  onClick={() => dispatch(userDetailsAction())}
+                  type="primary"
+                  shape="circle"
+                  icon={<LoginOutlined />}
+                  size="large"
+                />
+              </Tooltip>
+            )}
           </div>
         )}
       </Nav>

@@ -11,6 +11,9 @@ const Container = styled.div`
   align-items: center;
   overflow-y: hidden;
   overflow-x: hidden;
+  @media (max-width: 426px) {
+    margin-top: 170px;
+  }
 `;
 
 const Footer = styled.footer`

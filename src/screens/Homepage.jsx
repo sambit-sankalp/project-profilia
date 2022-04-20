@@ -1,11 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Card from '../components/home/Card';
 
 import styled from 'styled-components';
-import { Pagination } from 'antd';
+import { Pagination, Spin } from 'antd';
 
 import { useDispatch, useSelector } from 'react-redux';
-import { allUserAction, currentUserAction } from '../store/actions/userActions';
+import {
+  allUserAction,
+  currentUserAction,
+  userDetailsAction,
+} from '../store/actions/userActions';
+import FavouriteCards from '../components/home/FavouriteCards';
+import SuggestionsCards from '../components/home/SuggestionCards';
 
 const Container = styled.div`
   width: 100%;
@@ -14,14 +20,6 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   flex-direction: column;
-`;
-
-const CardContainer = styled.div`
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
 `;
 
 const IntroBanner = styled.div`
@@ -33,6 +31,32 @@ const IntroBanner = styled.div`
   justify-content: center;
   align-items: center;
   text-align: center;
+  @media (max-width: 426px) {
+    font-size: 20px;
+    padding: 0px 50px;
+  }
+`;
+
+const Title = styled.h1`
+  font-size: 30px;
+  margin-bottom: 0px;
+`;
+
+const Status = styled.p`
+  font-size: 20px;
+  margin-top: 0px;
+  margin-bottom: 30px;
+`;
+
+const HorizontalLines = styled.div`
+  width: 100px;
+  background-color: #000;
+  height: 1px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 5px auto;
 `;
 
 const Homepage = () => {
@@ -44,12 +68,19 @@ const Homepage = () => {
   const currentUser = useSelector((state) => state.currentUser);
   const { user } = currentUser;
 
+
   let array = Object.keys(allusers);
 
   useEffect(() => {
     dispatch(currentUserAction());
     dispatch(allUserAction());
-  }, [dispatch, allUserAction]);
+  }, [
+    dispatch,
+    allUserAction,
+    currentUserAction,
+    userDetailsAction,
+    localStorage.getItem('id'),
+  ]);
 
   if (localStorage.getItem('id')) {
     const index = array.indexOf(localStorage.getItem('id'));
@@ -61,27 +92,34 @@ const Homepage = () => {
     });
   }
 
+  // var favs = JSON.parse(localStorage.getItem('fav'));
+
+  // const suggestions = array.filter((e) => {
+  //   return !favs.includes(e);
+  // });
+
   return (
-    <Container>
-      {user && user.uid ? (
-        <>
-          <CardContainer>
-            {array.map((k, i) => {
-              return <Card key={i} data={allusers[k]} />;
-            })}
-          </CardContainer>
-          <Pagination
-            style={{ marginTop: '50px' }}
-            defaultCurrent={1}
-            total={50}
-          />
-        </>
+    <>
+      {loading ? (
+        <Spin />
       ) : (
-        <IntroBanner>
-          Heey pal, Welcome to Profilia. Please sign in to continue...
-        </IntroBanner>
+        <Container>
+          {user && user.uid ? (
+            <>
+              <Title>Status of the Day</Title>
+              <HorizontalLines />
+              <Status>{localStorage.getItem('status')}</Status>
+              <FavouriteCards allusers={allusers} />
+              <SuggestionsCards userArray={array} allusers={allusers} />
+            </>
+          ) : (
+            <IntroBanner>
+              Heey pal, Welcome to Profilia. Please sign in to continue...
+            </IntroBanner>
+          )}
+        </Container>
       )}
-    </Container>
+    </>
   );
 };
 

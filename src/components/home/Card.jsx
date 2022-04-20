@@ -16,9 +16,9 @@ function ProfileCard({ data }) {
 
   var cardsLiked = JSON.parse(localStorage.getItem('likes'));
   var cardsDisiked = JSON.parse(localStorage.getItem('dislikes'));
-  var favCards = JSON.parse(localStorage.getItem('dislikes'));
-  const [like, setLiker] = useState(data.likes);
-  const [disLike, setdisLiker] = useState(data.dislikes);
+  var favCards = JSON.parse(localStorage.getItem('fav'));
+  const [like, setLiker] = useState(data.likes ? data.likes : 0);
+  const [disLike, setdisLiker] = useState(data.dislikes ? data.dislikes : 0);
   const [likeActive, setLikeActive] = useState(
     cardsLiked ? cardsLiked.includes(data.uid) : false
   );
@@ -121,6 +121,7 @@ function ProfileCard({ data }) {
         localStorage.setItem('fav', JSON.stringify(favCards));
       }
     }
+    window.location.reload(false);
   };
 
   useEffect(() => {
