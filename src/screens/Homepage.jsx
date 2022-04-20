@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Card from '../components/home/Card';
 
 import styled from 'styled-components';
 import { Pagination, Spin } from 'antd';
@@ -91,12 +90,6 @@ const Homepage = () => {
       return allusers[b].likes - allusers[a].likes;
     });
   }
-
-  // var favs = JSON.parse(localStorage.getItem('fav'));
-
-  // const suggestions = array.filter((e) => {
-  //   return !favs.includes(e);
-  // });
 
   return (
     <>

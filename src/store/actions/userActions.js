@@ -36,7 +36,6 @@ import {
   update,
 } from 'firebase/database';
 import axios from 'axios';
-import { async } from '@firebase/util';
 
 export const googleAuthAction = () => async (dispatch) => {
   dispatch({ type: GOOGLE_LOGIN_REQUEST });
@@ -87,6 +86,7 @@ export const googleAuthAction = () => async (dispatch) => {
               uid: user.uid,
               name: user.displayName,
               email: user.email,
+              image: 'https://joeschmoe.io/api/v1/random',
               status: 'Hi there I am using this app',
               likes: 0,
               dislikes: 0,
@@ -132,7 +132,8 @@ export const signInAnonymouslyAction = () => async (dispatch) => {
       set(ref(db, 'users/' + results[0].login.uuid), {
         uid: results[0].login.uuid,
         name: `${results[0].name.first} ${results[0].name.last}`,
-        email: results[0].picture.large,
+        email: results[0].email,
+        image: results[0].picture.large,
         status: 'Hi there I am using this app',
         likes: 0,
         dislikes: 0,

@@ -88,7 +88,6 @@ function ProfileCard({ data }) {
 
   const handleLike = () => {
     if (dislikeActive) {
-      // setLike();
       setDislike();
     }
     setLike();
@@ -126,7 +125,7 @@ function ProfileCard({ data }) {
 
   useEffect(() => {
     dispatch(userUpdateAction(data.uid, like, disLike));
-  }, [like, disLike, fav, dispatch, localStorage.getItem('id')]);
+  }, [like, disLike, fav, dispatch]);
 
   return (
     <div className="card-container">
